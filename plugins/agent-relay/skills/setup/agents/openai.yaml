@@ -1,0 +1,4 @@
+interface:
+  display_name: "Set up Agent Relay"
+  short_description: "Bind agent identities to local projects"
+  default_prompt: "Set up project-bound Agent Relay identities safely. Keep every identity read-only unless I explicitly approve writes for that project."

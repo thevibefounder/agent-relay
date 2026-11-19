@@ -1,0 +1,4 @@
+interface:
+  display_name: "Agent Relay"
+  short_description: "Delegate local coding work with safe receipts"
+  default_prompt: "Use Agent Relay to coordinate this task with an available local agent, then verify the result before reporting completion."

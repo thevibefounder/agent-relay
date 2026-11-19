@@ -1,0 +1,30 @@
+{
+  "name": "agent-relay-router",
+  "version": "0.3.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "esbuild src/server.mjs --bundle --platform=node --format=esm --target=node20 --outfile=dist/server.mjs",
+    "check": "node --check src/server.mjs",
+    "smoke": "node tests/smoke-test.mjs",
+    "safety": "node tests/safety-test.mjs",
+    "process-test": "node tests/process-runner-test.mjs",
+    "session-store-test": "node tests/session-store-test.mjs",
+    "hardening-test": "node tests/hardening-test.mjs",
+    "config-test": "node tests/configure-test.mjs",
+    "dist-test": "node tests/dist-test.mjs",
+    "test": "npm run check && npm run build && npm run smoke && npm run safety && npm run process-test && npm run session-store-test && npm run hardening-test && npm run config-test && npm run dist-test",
+    "live-test": "node tests/live-claude-test.mjs --run"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/server": "2.3.1",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@modelcontextprotocol/client": "2.3.1",
+    "esbuild": "0.25.12"
+  }
+}
