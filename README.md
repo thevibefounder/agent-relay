@@ -12,16 +12,17 @@ On a Mac, open Terminal and paste this **one command**:
 curl -fsSL https://github.com/thevibefounder/agent-relay/releases/download/v0.3.0/install.sh | bash
 ```
 
-You need Node.js 20+ and the Claude Code and Codex CLIs installed. Use your own
-signed-in CLI accounts. If a prerequisite is missing, the installer tells you
-where to get it; reopen Terminal and rerun the same command afterward.
+The Mac installer adds Node.js 24 LTS, Claude Code and Codex if they are missing,
+then opens their official sign-in flows when needed. No Homebrew or administrator
+password is required. Existing working tools and provider settings are reused.
+Sign in with your own accounts; Relay does not supply model access or credits.
 
 The installer downloads and checksum-verifies v0.3.0, creates
 `~/AgentRelay-Workshop`, and connects both CLIs to that practice project in
-read-only mode. It prints the folder and first prompt. Restart any open CLI
-sessions, open the printed folder in Codex, and paste that prompt. Each CLI
+read-only mode. It prints the folder, immediate launch command and first prompt. Existing CLI
+sessions need a restart; new Terminal windows pick up the installed tools. Each CLI
 keeps its existing login, model and provider settings. Bedrock and Grok are
-optional. No model calls or consumer npm installs happen during setup.
+optional. No model calls or npm installs happen during setup. Sign-in stays with the official CLIs.
 
 For an existing project, use:
 

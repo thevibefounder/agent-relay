@@ -6,9 +6,18 @@ On a Mac, open Terminal (Command-Space, type Terminal, press Return) and paste:
 curl -fsSL https://github.com/thevibefounder/agent-relay/releases/download/v0.3.0/install.sh | bash
 ```
 
-You need Node.js 20+ and both coding CLIs. If something is missing, setup prints
-its official installation link and stops. Install it, open a new Terminal, and
-run the same command again. Links: [Node LTS](https://nodejs.org/en/download),
+Setup installs missing Node.js 24 LTS, Claude Code and Codex into your home
+folder using their official downloads. You do not need Homebrew or an
+administrator password. Existing working tools are reused. It also adds the
+installed tools to your shell PATH for future Terminal windows.
+
+After connecting the CLIs, setup opens the official sign-in flows if needed.
+Complete the browser/account choices yourself. Existing Bedrock, other provider
+settings and explicit provider launchers are preserved. If a custom provider
+requires credentials, keep using its normal setup. Downloads/installations and
+account sign-ins still need a working internet connection.
+
+Official sources: [Node LTS](https://nodejs.org/en/download),
 [Claude Code](https://code.claude.com/docs/en/setup),
 [Codex CLI](https://developers.openai.com/codex/cli/).
 
@@ -17,8 +26,9 @@ The installer checks the v0.3.0 ZIP checksum, installs the bundled router, makes
 project policy. It preserves other Relay connections, provider settings and
 credentials. It checks both router connections without making paid model calls.
 
-When it says **Connected Claude and Codex**, restart any CLI sessions already
-open. Run the printed `cd` command, then `codex`, and paste the prompt it shows.
+When setup and sign-in finish, use the printed `cd` and full launch command
+to start Codex immediately, then paste the first prompt it shows. Existing CLI
+sessions need a restart; future Terminal windows know the installed tools.
 It asks Claude to review README.md, waits for the completed job, and shows the
 answer. You may need to sign in or approve an MCP tool call in your CLI.
 Use your own account; usage and model access come from that account.
@@ -47,7 +57,8 @@ or translate API protocols. Keep keys in your normal provider settings.
 
 ## If setup stops
 
-- **Missing Node/CLI:** follow the printed official link, reopen Terminal and retry.
+- **Download/install failed:** check the connection and rerun the same command. Completed installations are reused.
+- **No interactive terminal:** open Claude/Codex and sign in when prompted. Automated installs can pass `--no-login` to defer browser sign-in.
 - **Existing connection differs:** it was preserved; use a different `--name`.
 - **Existing installation differs:** inspect the reported path before replacing it.
 - **Provider authentication/model error:** run that CLI directly and fix its sign-in first.
@@ -57,6 +68,8 @@ To disconnect the practice setup, run `codex mcp remove agent-relay-workshop`
 and, from its project folder, `claude mcp remove agent-relay-workshop`.
 This does not sign you out of either provider.
 
-The installer has been tested on macOS. Linux and WSL are not yet verified.
+Automatic prerequisite installation targets macOS on Apple Silicon and Intel.
+The fresh installation test runs on Apple Silicon; Intel, Linux and WSL are
+not yet verified. Automatic Node installation is limited to macOS.
 The v0.3.0 source tag and ZIP remain unchanged; the release's `install.sh`
 contains the automatic setup, so the ZIP's older manual command is not used.
