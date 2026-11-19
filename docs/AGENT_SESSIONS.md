@@ -11,3 +11,4 @@
 
 - The anonymous fresh-install test exposed Claude CLI option parsing: its variadic `-e` flag consumed the following server name. Moved the name before `-e` in both install examples.
 - Preserved the original v0.3.0 tag and source ZIP. Supplied a separately named corrected guide on the release page; router behavior is unchanged.
+- Final public-download verification passed on macOS / Node v24.22.1. Anonymous ZIP and guide download, checksum, fresh setup, isolated Claude and Codex registrations, bundled MCP discovery, and a real read-only Claude-on-Bedrock review all succeeded. The reviewer read the fresh fixture, identified its arithmetic bug, completed a bound session without permission denials and left files unchanged. No consumer npm dependencies or bundled provider credentials were used. The end-to-end request used a direct MCP test client; an initiating interactive Codex turn was not part of this fresh-download check.
