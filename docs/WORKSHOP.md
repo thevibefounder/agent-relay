@@ -1,156 +1,62 @@
-# Install AgentRelay 0.3.0
+# Connect Claude and Codex with one command
 
-AgentRelay lets Claude Code and Codex ask each other for a review or a coding
-task in one project. Each CLI uses your own account and provider settings.
-Bedrock is optional. Grok is optional.
-
-These steps use Terminal on a Mac. Linux users can use the same shell commands.
-On Windows, use a WSL terminal with Node, Claude Code and Codex installed inside
-WSL; native PowerShell installation is not covered by this release guide.
-The release install was tested on macOS; Linux and WSL are not yet verified.
-
-## 1. Install the prerequisites
-
-1. Install the current **LTS** release from [Node.js](https://nodejs.org/en/download).
-   The router requires Node 20 or later; choose a currently supported LTS.
-2. Install [Claude Code](https://code.claude.com/docs/en/setup) and
-   [Codex CLI](https://developers.openai.com/codex/cli/). The desktop apps alone
-   do not guarantee that the terminal commands are installed.
-3. Open **Terminal** (on a Mac, press Command-Space, type Terminal, press Return).
-   Run these commands one at a time:
+On a Mac, open Terminal (Command-Space, type Terminal, press Return) and paste:
 
 ```sh
-node --version
-claude --version
-codex --version
+curl -fsSL https://github.com/thevibefounder/agent-relay/releases/download/v0.3.0/install.sh | bash
 ```
 
-If any command says `command not found`, finish that tool's installation and
-open a new Terminal window before continuing.
+You need Node.js 20+ and both coding CLIs. If something is missing, setup prints
+its official installation link and stops. Install it, open a new Terminal, and
+run the same command again. Links: [Node LTS](https://nodejs.org/en/download),
+[Claude Code](https://code.claude.com/docs/en/setup),
+[Codex CLI](https://developers.openai.com/codex/cli/).
 
-Run `claude` once, complete its sign-in, then exit. Do the same with `codex`.
-Check that each can answer a short question on its own before adding Relay.
-Model access and usage charges come from your own accounts.
+The installer checks the v0.3.0 ZIP checksum, installs the bundled router, makes
+`~/AgentRelay-Workshop`, and registers both CLIs against the same read-only
+project policy. It preserves other Relay connections, provider settings and
+credentials. It checks both router connections without making paid model calls.
 
-## 2. Download the release
+When it says **Connected Claude and Codex**, restart any CLI sessions already
+open. Run the printed `cd` command, then `codex`, and paste the prompt it shows.
+It asks Claude to review README.md, waits for the completed job, and shows the
+answer. You may need to sign in or approve an MCP tool call in your CLI.
+Use your own account; usage and model access come from that account.
 
-Open the [v0.3.0 release](https://github.com/thevibefounder/agent-relay/releases/tag/v0.3.0)
-and click **agent-relay-v0.3.0.zip** under **Assets**. Double-click the ZIP in
-Downloads to extract it. Keep the extracted folder in a permanent location.
-You do not need a GitHub account or an npm install to run the bundled router.
+For the reverse direction, run `claude` in the same folder and ask it to use
+`agent-relay-workshop` to ask Codex for a review. Both CLIs need working logins
+for reviews in both directions. A job ID alone means the review is still running.
 
-In Terminal, type `cd ` (including the space), drag the extracted
-`agent-relay-v0.3.0` folder from Finder into Terminal, then press Return.
-Run:
+## Your own project
+
+Use an existing project folder instead of the practice project:
 
 ```sh
-RELAY_DIR="$PWD"
-NODE_BIN="$(command -v node)"
-CLAUDE_BIN="$(command -v claude)"
-CODEX_BIN="$(command -v codex)"
-RELAY_POLICY="$HOME/.agent-relay/workshop.json"
+curl -fsSL https://github.com/thevibefounder/agent-relay/releases/download/v0.3.0/install.sh | bash -s -- --project "/absolute/path/to/project" --name agent-relay-project
 ```
 
-Keep using this Terminal window for the next steps.
+If you want agents to code there, add `--allow-edits` to that command and
+explicitly ask for an edit. Use a new connection name when connecting a different
+project or changing its write policy. Keep the initiating CLI open until jobs
+finish; tasks can run for up to 30 minutes. Cancelled tasks may leave edits.
 
-## 3. Make a small practice project
+For an existing provider launcher, add `--codex /absolute/path/to/launcher` or
+`--claude /absolute/path/to/launcher`. Configure and verify the CLI's provider
+before using Relay. Bedrock is optional. Relay does not supply provider access
+or translate API protocols. Keep keys in your normal provider settings.
 
-Paste this block. It creates a disposable practice folder, without changing
-your existing project files:
+## If setup stops
 
-```sh
-PROJECT_DIR="$(mktemp -d "$HOME/agent-relay-practice.XXXXXX")"
-printf '# Practice project\nThe goal is to test a read-only agent review.\n' > "$PROJECT_DIR/README.md"
-node "$RELAY_DIR/plugins/agent-relay/scripts/configure.mjs" \
-  --config "$RELAY_POLICY" \
-  --workspace "$PROJECT_DIR" \
-  --claude "$CLAUDE_BIN" --codex "$CODEX_BIN"
-```
+- **Missing Node/CLI:** follow the printed official link, reopen Terminal and retry.
+- **Existing connection differs:** it was preserved; use a different `--name`.
+- **Existing installation differs:** inspect the reported path before replacing it.
+- **Provider authentication/model error:** run that CLI directly and fix its sign-in first.
+- **No Relay tools:** restart the CLI and check `codex mcp list` or `claude mcp list`.
 
-Expected output includes `Projects: 1` and `Agent identities: 2`.
-If `workshop.json` already exists, setup stops to protect it. Use a new policy
-filename in `RELAY_POLICY` and rerun the configure command. Do not use `--force`
-unless you intend to replace that policy.
+To disconnect the practice setup, run `codex mcp remove agent-relay-workshop`
+and, from its project folder, `claude mcp remove agent-relay-workshop`.
+This does not sign you out of either provider.
 
-To connect your own project instead, set `PROJECT_DIR` to that existing
-folder's absolute path and create a new policy with the same configure command.
-Start with a project you trust. Both CLIs receive its task and project context.
-
-## 4. Connect both CLIs
-
-The `--env`/`-e` setting below matters: it makes both CLIs load the same policy.
-The project ID is exactly `workspace`, which the setup command just created.
-Run:
-
-```sh
-codex mcp add agent-relay-workshop \
-  --env "AGENT_RELAY_CONFIG=$RELAY_POLICY" \
-  -- "$NODE_BIN" "$RELAY_DIR/plugins/agent-relay/router/dist/server.mjs" \
-  --host codex --project workspace
-
-cd "$PROJECT_DIR"
-claude mcp add --scope local agent-relay-workshop \
-  -e "AGENT_RELAY_CONFIG=$RELAY_POLICY" -- "$NODE_BIN" \
-  "$RELAY_DIR/plugins/agent-relay/router/dist/server.mjs" \
-  --host claude --project workspace
-```
-
-If that MCP name is already registered, inspect it with `codex mcp get
-agent-relay-workshop` or `claude mcp get agent-relay-workshop`. Remove only that
-registration with the matching `mcp remove agent-relay-workshop` command before
-registering it again. Restart any Claude or Codex session already open.
-
-## 5. Ask for the first review
-
-From the practice folder, start `codex` and paste:
-
-> Use agent-relay-workshop to ask Claude to review README.md in read-only mode.
-> Wait for the job to finish with get_result and show me Claude's actual answer.
-> Do not edit files.
-
-You may need to approve the MCP tool call in the initiating CLI. A successful
-result includes `status: completed`, the reviewer answer and its model.
-A job ID alone means the review is still running.
-
-To try the reverse direction, start `claude` in the same practice folder and
-ask it to use `agent-relay-workshop` to ask Codex for a read-only review.
-Codex needs working authentication for the reverse direction too.
-
-## Optional: let them code
-
-Create a separate policy for your intended project using the same configure
-command with `--allow-edits` added. Register that policy in both CLIs. Then
-explicitly ask for an edit, for example:
-
-> Ask the other agent to fix the failing test in this project, wait for it to
-> finish, and show me the changes and verification.
-
-The initiating agent still owns the task. One delegated writer can run per
-checkout. Keep the initiating CLI open while a job runs; jobs can take up to
-30 minutes. Cancellation can leave edits to inspect. Headless provider runs
-can refuse commands that require interactive approval.
-
-## Optional: Bedrock or another provider
-
-Configure and verify your CLI with that provider first. Relay reuses the CLI's
-existing model, provider and authentication. It does not supply Bedrock access,
-translate API protocols, or choose a provider for you.
-
-For a Codex provider launcher, use `--codex /absolute/path/to/your-launcher`
-in the configure command. Keep credentials in the provider's normal local
-settings or secure environment. Never paste keys into the Relay policy or repo.
-
-## Troubleshooting
-
-| Symptom | What to check |
-| --- | --- |
-| `Unknown connected project: workspace` | Both registrations must point to the policy created in step 3 through `AGENT_RELAY_CONFIG`; check that it contains the project ID `workspace`. |
-| Claude or Codex unavailable | Run its `--version` command. Rerun setup with a new policy and the explicit `--claude` / `--codex` executable paths. |
-| No Relay tools | Check `codex mcp list` or `claude mcp list`, then restart the CLI. |
-| Authentication or model error | Run the target CLI directly and fix its account/provider setup first. |
-| Review still running | Keep the initiating session open and have it poll `get_result`; polling does not start another review. |
-| Edit denied | Use a policy created with `--allow-edits` and explicitly request edit mode. |
-
-To disconnect the workshop, run `codex mcp remove agent-relay-workshop` and,
-from the connected project, `claude mcp remove agent-relay-workshop`.
-Removing Relay does not sign you out of either provider.
+The installer has been tested on macOS. Linux and WSL are not yet verified.
+The v0.3.0 source tag and ZIP remain unchanged; the release's `install.sh`
+contains the automatic setup, so the ZIP's older manual command is not used.

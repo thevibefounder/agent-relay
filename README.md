@@ -6,46 +6,39 @@ Claude and Codex can ask each other to review or edit one connected project. The
 
 ## Quick start
 
-**New here? Follow the [step-by-step install guide](docs/WORKSHOP.md).** It covers
-Node, CLI sign-in, a practice project, both registrations and your first review.
-
-Download [AgentRelay v0.3.0](https://github.com/thevibefounder/agent-relay/releases/tag/v0.3.0).
-**Use the corrected `INSTALL-v0.3.0.md` guide attached to the release**; the
-original ZIP contains an older Claude registration example. The guide on this
-main branch includes the correction too.
-The release includes the bundled router and needs no consumer npm dependencies.
-Use your own Claude and Codex logins. Bedrock and Grok are optional.
-
-Already have Node 20+, Claude Code and Codex CLI? From this extracted checkout:
+On a Mac, open Terminal and paste this **one command**:
 
 ```sh
-RELAY_DIR="$PWD"
-RELAY_POLICY="$HOME/.agent-relay/my-project.json"
-node plugins/agent-relay/scripts/configure.mjs \
-  --config "$RELAY_POLICY" --workspace /absolute/path/to/project \
-  --claude "$(command -v claude)" --codex "$(command -v codex)"
-
-codex mcp add agent-relay \
-  --env "AGENT_RELAY_CONFIG=$RELAY_POLICY" \
-  -- "$(command -v node)" "$RELAY_DIR/plugins/agent-relay/router/dist/server.mjs" \
-  --host codex --project workspace
-
-cd /absolute/path/to/project
-claude mcp add --scope local agent-relay \
-  -e "AGENT_RELAY_CONFIG=$RELAY_POLICY" -- "$(command -v node)" \
-  "$RELAY_DIR/plugins/agent-relay/router/dist/server.mjs" \
-  --host claude --project workspace
+curl -fsSL https://github.com/thevibefounder/agent-relay/releases/download/v0.3.0/install.sh | bash
 ```
 
-Use an unused policy filename; setup refuses to overwrite an existing policy.
-Restart the CLIs. Ask either agent to use Relay to ask the other for a review,
-wait with `get_result`, and show the completed answer. Setup is read-only by
-default. Add `--allow-edits` during setup only for a project where you want to
-explicitly request coding tasks.
+You need Node.js 20+ and the Claude Code and Codex CLIs installed. Use your own
+signed-in CLI accounts. If a prerequisite is missing, the installer tells you
+where to get it; reopen Terminal and rerun the same command afterward.
 
-Relay starts each installed CLI with its existing model and provider settings.
-For a Codex provider launcher, pass `--codex /absolute/path/to/your-launcher`.
-Keep credentials in your provider setup, outside this repository and Relay policy.
+The installer downloads and checksum-verifies v0.3.0, creates
+`~/AgentRelay-Workshop`, and connects both CLIs to that practice project in
+read-only mode. It prints the folder and first prompt. Restart any open CLI
+sessions, open the printed folder in Codex, and paste that prompt. Each CLI
+keeps its existing login, model and provider settings. Bedrock and Grok are
+optional. No model calls or consumer npm installs happen during setup.
+
+For an existing project, use:
+
+```sh
+curl -fsSL https://github.com/thevibefounder/agent-relay/releases/download/v0.3.0/install.sh | bash -s -- --project "/absolute/path/to/project" --name agent-relay-project
+```
+
+Add `--allow-edits` only if you want to explicitly request coding tasks in that
+project. For a Codex provider launcher, add `--codex /absolute/path/to/launcher`.
+Existing connections and differing policies are preserved; use a different
+`--name` when connecting a different project. Rerunning the same install reuses
+matching files and connections.
+
+[Download the ZIP](https://github.com/thevibefounder/agent-relay/releases/tag/v0.3.0)
+or read [setup details](docs/WORKSHOP.md). The one-command installer handles both
+registrations, including the Claude command correction; no separate corrected
+guide is needed.
 
 ## How a handoff works
 
