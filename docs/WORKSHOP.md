@@ -89,8 +89,8 @@ codex mcp add agent-relay-workshop \
   --host codex --project workspace
 
 cd "$PROJECT_DIR"
-claude mcp add --scope local -e "AGENT_RELAY_CONFIG=$RELAY_POLICY" \
-  agent-relay-workshop -- "$NODE_BIN" \
+claude mcp add --scope local agent-relay-workshop \
+  -e "AGENT_RELAY_CONFIG=$RELAY_POLICY" -- "$NODE_BIN" \
   "$RELAY_DIR/plugins/agent-relay/router/dist/server.mjs" \
   --host claude --project workspace
 ```

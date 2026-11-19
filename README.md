@@ -10,6 +10,9 @@ Claude and Codex can ask each other to review or edit one connected project. The
 Node, CLI sign-in, a practice project, both registrations and your first review.
 
 Download [AgentRelay v0.3.0](https://github.com/thevibefounder/agent-relay/releases/tag/v0.3.0).
+**Use the corrected `INSTALL-v0.3.0.md` guide attached to the release**; the
+original ZIP contains an older Claude registration example. The guide on this
+main branch includes the correction too.
 The release includes the bundled router and needs no consumer npm dependencies.
 Use your own Claude and Codex logins. Bedrock and Grok are optional.
 
@@ -28,8 +31,8 @@ codex mcp add agent-relay \
   --host codex --project workspace
 
 cd /absolute/path/to/project
-claude mcp add --scope local -e "AGENT_RELAY_CONFIG=$RELAY_POLICY" \
-  agent-relay -- "$(command -v node)" \
+claude mcp add --scope local agent-relay \
+  -e "AGENT_RELAY_CONFIG=$RELAY_POLICY" -- "$(command -v node)" \
   "$RELAY_DIR/plugins/agent-relay/router/dist/server.mjs" \
   --host claude --project workspace
 ```
